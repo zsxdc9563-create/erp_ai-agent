@@ -3,8 +3,8 @@
 一套自建的全端 ERP 系統，整合採購、銷售、庫存、客戶等模組，並內建一個**全地端（不依賴雲端 API）的 AI 助手**。
 
 AI 助手有兩種模式：
-- ** 查時事**：透過自架的 SearXNG 搜尋 + 爬蟲抓取新聞正文，交給本地 LLM 摘要（RAG）。
-- ** 查庫存**：讓本地 LLM 讀取 ERP 內部資料（庫存等），用自然語言回答。
+- **📰 查時事**：透過自架的 SearXNG 搜尋 + 爬蟲抓取新聞正文，交給本地 LLM 摘要（RAG）。
+- **📊 查庫存**：讓本地 LLM 讀取 ERP 內部資料（庫存等），用自然語言回答。
 
 > 學習導向專案，採用標準三層架構（Routes → Controllers → Models），重點在理解每一層的職責。
 
@@ -13,15 +13,36 @@ AI 助手有兩種模式：
 ## 技術架構
 
 ```
-Vue 3 前端 (:5173)
-      │  HTTP
-      ▼
-Node.js / Express (:3000)  ──►  MySQL 8.0
-      │  proxy
-      ▼
-Python / FastAPI (:8000)
-      ├─► SearXNG (Docker, :8080)  ──►  網頁爬蟲 (httpx + trafilatura)
-      └─► Gemma 4 (本地 GGUF, llama-cpp-python, CPU)
+                    Vue 3 前端 (:5173)
+                          │  HTTP
+                          ▼
+                Node.js / Express (:3000) ─────► MySQL 8.0（ERP 資料）
+                     │            ▲
+        proxy        │            │ 內部 API（/api/internal/*，不掛 auth）
+       /api/ai/*     │            │ 供 AI 查 ERP 資料
+                     ▼            │
+                Python / FastAPI (:8000)
+                     │
+                     ├─► SearXNG (Docker, :8080) ─► 網頁爬蟲 (httpx + trafilatura)
+                     │        （/news：查時事）
+                     │
+                     ├─► Node 內部 API ─► MySQL
+                     │        （/erp：查 ERP 庫存資料）
+                     │
+                     └─► Gemma 4（本地 GGUF, llama-cpp-python, CPU）
+                              （讀取上述資料後生成回答）
+```
+
+### 資料流
+
+**查時事（/news）：**
+```
+Vue → Node (proxy) → Python → SearXNG → 爬蟲抓正文 → Gemma → 回傳
+```
+
+**查庫存（/erp）：**
+```
+Vue → Node (proxy) → Python → Node 內部 API (/api/internal) → MySQL → Gemma → 回傳
 ```
 
 | 層 | 技術 |
@@ -46,9 +67,9 @@ erp-system/
 │       ├── router/         # 路由 + 守衛
 │       └── App.vue         # 主版面（含右上角 AI 助手）
 ├── server/                 # Node / Express 後端
-│   ├── routes/             # 路由層
+│   ├── routes/             # 路由層（含 ai.js、internal.js）
 │   ├── controllers/        # 控制器層
-│   ├── models/             # 資料存取層
+│   ├── models/             # 資料存取層（連 MySQL）
 │   └── index.js            # 進入點
 └── ai-agent/               # Python AI 微服務
     ├── main.py             # FastAPI 進入點（/chat、/news、/erp）
@@ -141,7 +162,7 @@ server:
 | GET | `/` | 健康檢查 |
 | POST | `/chat` | 純對話 |
 | POST | `/news` | 查時事（SearXNG → 爬蟲 → LLM） |
-| POST | `/erp` | 查 ERP 內部資料 → LLM |
+| POST | `/erp` | 查 ERP 內部資料（Node 內部 API → MySQL → LLM） |
 
 互動式 API 文件：`http://127.0.0.1:8000/docs`
 
@@ -149,8 +170,8 @@ server:
 
 ## 設計重點
 
-- **Node 為唯一 API 閘道**：前端只與 Node 溝通，Python 由 Node 內部代理，權限控管集中於 Node。
-- **AI 查 ERP 走內部路由**：`/api/internal/*` 不掛 auth，供 Python 服務內部呼叫（本機開發用）。
+- **Node 為唯一 API 閘道**：前端只與 Node 溝通，Python 由 Node 代理，權限控管集中於 Node。
+- **AI 查 ERP 走內部路由**：`/api/internal/*` 不掛 auth，供 Python 服務內部呼叫並讀取 MySQL（本機開發用）。
 - **RAG 模式**：先檢索（搜尋/查庫存）再交給 LLM 生成，避免幻覺、補足即時資訊。
 - **全地端推論**：模型在本機跑，資料不外傳、無 API 費用。
 
