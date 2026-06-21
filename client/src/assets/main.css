@@ -1,0 +1,74 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg: #F4F5F7;
+  --color-sidebar: #1A1D27;
+  --color-sidebar-hover: #252836;
+  --color-sidebar-active: #2D3142;
+  --color-accent: #4F7EFF;
+  --color-accent-light: #EEF2FF;
+  --color-accent-dark: #3A6AE8;
+  --color-surface: #FFFFFF;
+  --color-border: #E8EAF0;
+  --color-text-primary: #1A1D27;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
+  --color-success: #10B981;
+  --color-success-light: #ECFDF5;
+  --color-warning: #F59E0B;
+  --color-warning-light: #FFFBEB;
+  --color-danger: #EF4444;
+  --color-danger-light: #FEF2F2;
+  --color-info: #3B82F6;
+  --color-info-light: #EFF6FF;
+  --sidebar-width: 240px;
+  --header-height: 60px;
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --transition: 0.2s ease;
+}
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+
+/* Table base */
+table { border-collapse: collapse; width: 100%; }
+
+/* Utility */
+.text-success { color: var(--color-success); }
+.text-danger { color: var(--color-danger); }
+.text-warning { color: var(--color-warning); }
+.text-muted { color: var(--color-text-muted); }
+
+/* Badge base */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.badge-success { background: var(--color-success-light); color: #065F46; }
+.badge-warning { background: var(--color-warning-light); color: #92400E; }
+.badge-danger  { background: var(--color-danger-light);  color: #991B1B; }
+.badge-info    { background: var(--color-info-light);    color: #1E40AF; }
+.badge-gray    { background: #F3F4F6; color: #6B7280; }

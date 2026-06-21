@@ -1,0 +1,23 @@
+# 依賴套件
+node_modules/
+ai-agent/venv/
+
+# AI 模型檔（太大，不上傳）
+ai-agent/model/
+*.gguf
+*.safetensors
+
+# Python
+__pycache__/
+*.pyc
+
+# 環境變數（含密碼，不能上傳！）
+.env
+*.env
+
+# 建置產物
+client/dist/
+
+# 系統檔
+.DS_Store
+Thumbs.db

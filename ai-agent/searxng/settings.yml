@@ -1,0 +1,10 @@
+use_default_settings: true  # 沿用SearXNG內建的完整預設
+
+server:
+  secret_key: "change-this-to-any-random-string-12345"   # 隨便改成一串亂碼
+  limiter: false        # 本機自用，關掉限流，否則程式呼叫會被擋
+
+search:
+  formats:
+    - html
+    - json              # ★ 關鍵：打開 JSON 輸出，不加這行 API 會回 HTML

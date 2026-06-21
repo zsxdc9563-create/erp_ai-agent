@@ -1,0 +1,6 @@
+node_modules/
+ai-agent/venv/
+ai-agent/model/
+*.gguf
+__pycache__/
+.env
