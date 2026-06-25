@@ -21,3 +21,10 @@ client/dist/
 # 系統檔
 .DS_Store
 Thumbs.db
+
+# AI 暫存資料（自動產生，不需上傳）
+ai-agent/db_cache/
+
+# Log 檔
+*.log
+npm-debug.log*

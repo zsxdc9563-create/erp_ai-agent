@@ -61,8 +61,18 @@ const routes = [
   name: 'Reports',
   component: () => import('../views/ReportView.vue'),
   meta: { title: '報表分析', icon: '📈' }
-}
+},
   
+{
+    path: '/kanban',
+    name: 'Kanban',
+    component: () => import('../views/KanbanView.vue'),
+    meta: { title: '工作看板', icon: '📋' }
+  }
+
+
+
+
 ]
 
 

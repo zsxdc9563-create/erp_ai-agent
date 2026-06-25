@@ -438,6 +438,25 @@ onMounted(loadData)
 .btn-primary { background: var(--color-accent); color: white; border: none; border-radius: var(--border-radius); padding: 8px 16px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background var(--transition); font-family: inherit; }
 .btn-primary:hover { background: var(--color-accent-dark); }
 
+
+.btn-outline {
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-outline:hover { background: var(--color-accent-dark); }
+
+
+
 .table-wrap { overflow-x: auto; }
 table th { background: #F8F9FC; padding: 10px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--color-border); white-space: nowrap; }
 table td { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; font-size: 13.5px; }

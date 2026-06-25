@@ -1,9 +1,11 @@
+require('dotenv').config({ path: require('path').join(__dirname, '../.env') })
 const express = require('express')
 const cors = require('cors')
 const path = require('path')
 const logger = require('./middleware/logger')
 const errorHandler = require('./middleware/errorHandler')
 const auth = require('./middleware/auth')
+const tasksRouter = require('./routes/tasks')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -30,6 +32,13 @@ app.use('/api/inventory', auth, require('./routes/inventory'))
 app.use('/api/suppliers', auth, require('./routes/suppliers'))
 app.use('/api/customers', auth, require('./routes/customers'))
 app.use('/api/reports',   auth, require('./routes/reports'))
+app.use('/api/alerts',   auth, require('./routes/alerts'))
+app.use('/api/auth', require('./routes/auth'))
+app.use('/api/tasks', auth, tasksRouter)
+
+
+
+
 
 // 錯誤處理
 app.use(errorHandler)

@@ -1,4 +1,4 @@
-const pool = require('../database')
+const pool = require('../config/database')
 
 const SalesModel = {
   async findAll({ search, status } = {}) {

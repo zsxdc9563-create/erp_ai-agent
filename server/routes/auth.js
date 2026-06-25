@@ -1,6 +1,7 @@
+const jwt = require('jsonwebtoken')
 const express = require('express')
 const router = express.Router()
-const pool = require('../database')
+const pool = require('../config/database')
 
 router.post('/login', async (req, res) => {
   try {
@@ -15,13 +16,16 @@ router.post('/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({ success: false, message: '帳號或密碼錯誤' })
     }
+
+    const token = jwt.sign(
+      { userId: user.id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    )
+
     res.json({
       success: true,
-      data: {
-        id: user.id, name: user.name,
-        email: user.email, role: user.role,
-        token: `token-${user.id}-${Date.now()}`
-      }
+      data: { id: user.id, name: user.name, email: user.email, role: user.role, token }
     })
   } catch (e) {
     res.status(500).json({ success: false, message: e.message })
@@ -36,13 +40,14 @@ router.get('/me', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1]
     if (!token) return res.status(401).json({ success: false, message: '未登入' })
-    const userId = token.split('-')[1]
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const [[user]] = await pool.query(
-      'SELECT id, name, email, role FROM users WHERE id = ?', [userId]
+      'SELECT id, name, email, role FROM users WHERE id = ?', [decoded.userId]
     )
     if (!user) return res.status(401).json({ success: false, message: '使用者不存在' })
     res.json({ success: true, data: user })
   } catch (e) {
+    console.error('LOGIN ERROR:', e.message)  // 加這行
     res.status(500).json({ success: false, message: e.message })
   }
 })

@@ -1,4 +1,4 @@
-const pool = require('../database')
+const pool = require('../config/database')
 
 const ReportModel = {
   // 月份銷售統計

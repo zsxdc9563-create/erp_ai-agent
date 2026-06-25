@@ -1,21 +1,5 @@
 <template>
   <div class="home-page">
-    <!-- 歡迎區塊 -->
-    <div class="hero">
-      <div class="hero-content">
-        <div class="hero-logo">⬡</div>
-        <h1 class="hero-title">ERP System</h1>
-        <p class="hero-sub">企業資源規劃系統 — 整合採購、銷售、庫存、客戶於一體</p>
-        <div class="hero-info">
-          <span>👤 {{ authStore.userName }}</span>
-          <span>🔑 {{ authStore.userRole }}</span>
-          <span>🕐 {{ currentTime }}</span>
-        </div>
-        <button class="hero-btn" @click="router.push('/dashboard')">
-          進入系統 →
-        </button>
-      </div>
-    </div>
 
     <!-- 快速統計 -->
     <div class="stats-grid">
@@ -26,6 +10,60 @@
           <div class="stat-label">{{ stat.label }}</div>
         </div>
         <div class="stat-arrow">→</div>
+      </div>
+    </div>
+
+    <!-- 工作看板 -->
+    <div class="kanban-section">
+      <div class="kanban-header">
+        <h2 class="section-title">工作看板</h2>
+        <button class="add-task-btn" v-if="canEdit" @click="showAddModal = true">+ 新增任務</button>
+      </div>
+      <div class="kanban-board">
+        <div
+          v-for="col in columns"
+          :key="col.key"
+          class="kanban-col"
+          @dragover.prevent
+          @drop="onDrop(col.key)"
+        >
+          <div class="col-header" :style="{ borderColor: col.color }">
+            <span class="col-title">{{ col.label }}</span>
+            <span class="col-count" :style="{ background: col.color }">{{ getColumnTasks(col.key).length }}</span>
+          </div>
+          <div class="col-body">
+            <div
+              v-for="task in getColumnTasks(col.key)"
+              :key="task.id"
+              class="task-card"
+              :draggable="canEdit"
+              @dragstart="canEdit && onDragStart(task.id)"
+            >
+              <div class="task-title">{{ task.title }}</div>
+              <div class="task-desc" v-if="task.description">{{ task.description }}</div>
+              <div class="task-footer">
+                  <span class="task-assignee" v-if="task.assigned_name">👤 {{ task.assigned_name }}</span>
+                  <span class="task-creator">by {{ task.creator_name }}</span>
+                  <span class="task-date">{{ new Date(task.created_at).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) }}</span>
+                  <button class="task-delete" v-if="isAdmin" @click="handleDelete(task.id)">✕</button>
+                </div>
+            </div>
+            <div v-if="getColumnTasks(col.key).length === 0" class="col-empty">拖曳卡片到這裡</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 新增任務 Modal -->
+    <div class="modal-overlay" v-if="showAddModal" @click.self="showAddModal = false">
+      <div class="modal">
+        <h3>新增任務</h3>
+        <input v-model="newTask.title" placeholder="任務標題 *" class="modal-input" />
+        <textarea v-model="newTask.description" placeholder="描述（選填）" class="modal-textarea"></textarea>
+        <div class="modal-actions">
+          <button class="btn-cancel" @click="showAddModal = false">取消</button>
+          <button class="btn-confirm" @click="handleAddTask">新增</button>
+        </div>
       </div>
     </div>
 
@@ -53,6 +91,7 @@
         <div class="info-value">{{ info.value }}</div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -61,6 +100,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { fetchSummary } from '@/api/reports'
+import { fetchTasks, createTask, updateTaskStatus, deleteTask } from '@/api/tasks'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -99,15 +139,63 @@ const systemInfo = [
   { label: '建立日期', value: '2026-06-12' },
 ]
 
+// Kanban
+const tasks = ref([])
+const showAddModal = ref(false)
+const newTask = ref({ title: '', description: '', assigned_to: '' })
+
+const columns = [
+  { key: 'todo', label: '待處理', color: '#6366F1' },
+  { key: 'in_progress', label: '進行中', color: '#F59E0B' },
+  { key: 'review', label: '審核中', color: '#3B82F6' },
+  { key: 'done', label: '完成', color: '#10B981' },
+]
+
+const getColumnTasks = (status) => tasks.value.filter(t => t.status === status)
+
+const loadTasks = async () => {
+  const res = await fetchTasks()
+  if (res.success) tasks.value = res.data
+}
+
+const handleAddTask = async () => {
+  if (!newTask.value.title) return
+  await createTask(newTask.value)
+  newTask.value = { title: '', description: '', assigned_to: '' }
+  showAddModal.value = false
+  await loadTasks()
+}
+
+const handleDelete = async (id) => {
+  await deleteTask(id)
+  await loadTasks()
+}
+
+// 拖曳
+
+const isAdmin = computed(() => authStore.userRole === '系統管理員')
+const isManager = computed(() => authStore.userRole === '主管')
+const canEdit = computed(() => isAdmin.value || isManager.value)
+const dragTaskId = ref(null)
+const onDragStart = (id) => { dragTaskId.value = id }
+const onDrop = async (status) => {
+  if (dragTaskId.value) {
+    await updateTaskStatus(dragTaskId.value, status)
+    dragTaskId.value = null
+    await loadTasks()
+  }
+}
+
 onMounted(async () => {
   const res = await fetchSummary()
   if (res.success) summary.value = res.data
+  await loadTasks()
 })
 </script>
 
 <style scoped>
 .home-page { display: flex; flex-direction: column; gap: 24px; }
-
+.task-date { font-size: 10px; color: var(--color-text-muted); }
 /* Hero */
 .hero {
   background: linear-gradient(135deg, #1A1D27 0%, #2D3142 100%);
@@ -186,14 +274,97 @@ onMounted(async () => {
 .info-label { font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px; }
 .info-value { font-size: 13px; font-weight: 600; }
 
+/* Kanban */
+.kanban-section { display: flex; flex-direction: column; gap: 14px; }
+.kanban-header { display: flex; align-items: center; justify-content: space-between; }
+.add-task-btn {
+  background: var(--color-accent); color: white;
+  border: none; border-radius: var(--border-radius);
+  padding: 8px 16px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+.add-task-btn:hover { background: var(--color-accent-dark); }
+.kanban-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.kanban-col {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden; box-shadow: var(--shadow-sm);
+}
+.col-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  border-top: 3px solid;
+  border-bottom: 1px solid var(--color-border);
+}
+.col-title { font-size: 13px; font-weight: 700; }
+.col-count {
+  color: white; font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: 99px;
+}
+.col-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
+.task-card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: 10px 12px; cursor: grab;
+}
+.task-card:active { cursor: grabbing; }
+.task-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.task-desc { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 6px; line-height: 1.4; }
+.task-footer { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--color-text-muted); }
+.task-assignee { flex: 1; }
+.task-creator { margin-left: auto; }
+.task-delete {
+  background: none; border: none; color: var(--color-text-muted);
+  cursor: pointer; font-size: 12px; padding: 0 2px;
+}
+.task-delete:hover { color: #EF4444; }
+.col-empty { font-size: 12px; color: var(--color-text-muted); text-align: center; padding: 20px 0; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  padding: 24px; width: 400px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.modal h3 { font-size: 16px; font-weight: 700; margin: 0; }
+.modal-input, .modal-textarea {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: 10px 12px; font-size: 13px;
+  font-family: inherit; background: var(--color-bg);
+  color: var(--color-text); width: 100%; box-sizing: border-box;
+}
+.modal-textarea { height: 80px; resize: vertical; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.btn-cancel {
+  background: none; border: 1px solid var(--color-border);
+  border-radius: var(--border-radius); padding: 8px 16px;
+  font-size: 13px; cursor: pointer; font-family: inherit;
+}
+.btn-confirm {
+  background: var(--color-accent); color: white;
+  border: none; border-radius: var(--border-radius);
+  padding: 8px 16px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+
+
+
 @media (max-width: 1024px) {
   .stats-grid { grid-template-columns: repeat(3, 1fr); }
   .modules-grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 768px) {
-  .hero { padding: 32px 20px; }
-  .hero-title { font-size: 24px; }
-  .hero-info { flex-direction: column; gap: 8px; }
+  
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .modules-grid { grid-template-columns: repeat(2, 1fr); }
   .system-info { flex-direction: column; }

@@ -1,4 +1,4 @@
-const pool = require('../database')
+const pool = require('../config/database')
 
 const SupplierModel = {
   async findAll({ search } = {}) {

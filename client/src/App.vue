@@ -10,7 +10,7 @@
     <div v-if="sidebarOpen" class="sidebar-mask" @click="sidebarOpen = false"></div>
 
     <!-- Sidebar -->
-    <aside class="sidebar" :class="{ open: sidebarOpen }">
+    <aside class="sidebar" :class="{ open: sidebarOpen, collapsed: sidebarCollapsed }">
       <div class="sidebar-header">
         <div class="logo" @click="router.push('/home')" style="cursor:pointer">
           <span class="logo-icon">⬡</span>
@@ -54,6 +54,14 @@
       <header class="top-header">
         <div class="header-left">
           <button class="menu-btn" @click="sidebarOpen = true">☰</button>
+          <!-- 👇 新增：桌面版收合鈕 -->
+          <button
+            class="collapse-btn"
+            @click="toggleCollapse"
+            :title="sidebarCollapsed ? '展開側邊欄' : '收合側邊欄'"
+          >
+            {{ sidebarCollapsed ? '⮞' : '⮜' }}
+          </button>
           <div>
             <h1 class="page-title">{{ route.meta?.title }}</h1>
             <div class="breadcrumb">
@@ -193,9 +201,15 @@ const route = useRoute()
 const router = useRouter()        
 const authStore = useAuthStore()
 const sidebarOpen = ref(false)
+const sidebarCollapsed = ref(false)
+function toggleCollapse() {
+  sidebarCollapsed.value = !sidebarCollapsed.value
+}
+
 const showNotify = ref(false)
 const showSettings = ref(false)
 const notifications = ref([])
+
 // AI 助手
 const showAI = ref(false)
 const aiQuery = ref('')
@@ -203,9 +217,7 @@ const aiAnswer = ref('')
 const aiSources = ref([])
 const aiLoading = ref(false)
 const aiError = ref('')
-const aiMode = ref('news')   // 'news' = 查時事, 'erp' = 查庫存
-
-
+const aiMode = ref('news')
 
 async function askAI() {
   if (!aiQuery.value.trim() || aiLoading.value) return
@@ -214,9 +226,8 @@ async function askAI() {
   aiAnswer.value = ''
   aiSources.value = []
   try {
-    // 依模式決定打哪個 API
     const url = aiMode.value === 'erp' ? '/api/ai/erp' : '/api/ai/news'
-
+    console.log('=== AI 請求 ===', url, aiQuery.value.trim())
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -224,16 +235,16 @@ async function askAI() {
     })
     if (!res.ok) throw new Error('AI 服務回應異常（' + res.status + '）')
     const data = await res.json()
+    console.log('=== AI 回應 ===', JSON.stringify(data))
+    if (!data) throw new Error('回應為空')
     aiAnswer.value = data.answer || '沒有取得回答'
-    aiSources.value = data.sources || []   // ERP 沒有 sources，會是空陣列，正常
+    aiSources.value = data.sources || []
   } catch (e) {
     aiError.value = '查詢失敗：' + e.message
   } finally {
     aiLoading.value = false
   }
 }
-
-
 
 const navItems = [
   { path: '/dashboard', icon: '📊', label: '總覽儀表板' },
@@ -242,10 +253,10 @@ const navItems = [
   { path: '/inventory', icon: '🏪', label: '存貨管理' },
   { path: '/suppliers', icon: '🏭', label: '供應商管理' },
   { path: '/customers', icon: '👥', label: '客戶管理' },
-  { path: '/reports',   icon: '📈', label: '報表分析' }
+  { path: '/reports',   icon: '📈', label: '報表分析' },
+  { path: '/kanban', icon: '📋', label: '工作看板' },
 ]
 
-// 時間
 const now = ref(new Date())
 let timer = null
 
@@ -266,7 +277,6 @@ async function logout() {
   router.push('/login')
 }
 
-// 載入通知
 async function loadNotifications() {
   try {
     const res = await fetchLowStock()
@@ -287,7 +297,9 @@ async function loadNotifications() {
 
 onMounted(() => {
   timer = setInterval(() => { now.value = new Date() }, 1000)
-  loadNotifications()
+  if (authStore.isLoggedIn) {
+    loadNotifications()
+  }
 })
 
 onUnmounted(() => {
@@ -378,7 +390,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  transition: transform 0.3s ease;
+  transition: width 0.3s ease, transform 0.3s ease;
   z-index: 200;
 }
 
@@ -558,22 +570,36 @@ onUnmounted(() => {
 
 
 
-@media (max-width: 768px) {
-  .sidebar {
-    position: fixed;
-    top: 0; left: 0; bottom: 0;
-    transform: translateX(-100%);
-  }
-  .sidebar.open { transform: translateX(0); }
-  .sidebar-close { display: flex; }
-  .sidebar-mask { display: block; }
-  .menu-btn { display: flex; }
-  .header-date { display: none; }
-  .content-area { padding: 16px; }
-  .top-header { padding: 0 16px; }
+/* === 桌面版收合：只剩 icon === */
+@media (min-width: 769px) {
+  .sidebar.collapsed { width: var(--sidebar-collapsed-width, 68px); }
+
+  /* 收合時隱藏所有文字，只留圖示 */
+  .sidebar.collapsed .logo-text,
+  .sidebar.collapsed .logo-sub,
+  .sidebar.collapsed .nav-label,
+  .sidebar.collapsed .nav-section-label,
+  .sidebar.collapsed .user-detail { display: none; }
+
+  /* 剩下的圖示置中 */
+  .sidebar.collapsed .logo,
+  .sidebar.collapsed .nav-item,
+  .sidebar.collapsed .user-info { justify-content: center; }
+  .sidebar.collapsed .nav-item { padding: 10px; }
 }
 
+.collapse-btn {
+  border: none; background: var(--color-bg);
+  border-radius: var(--border-radius);
+  width: 36px; height: 36px;
+  font-size: 14px; cursor: pointer; flex-shrink: 0;
+  color: var(--color-text-secondary);
+  display: flex; align-items: center; justify-content: center;
+}
+.collapse-btn:hover { background: var(--color-border); }
+
 @media (max-width: 480px) {
+  .collapse-btn { display: none; }
   .content-area { padding: 12px; }
   .page-title { font-size: 14px; }
 }
