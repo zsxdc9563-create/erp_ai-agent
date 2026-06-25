@@ -32,7 +32,7 @@
           :class="{ active: route.path === item.path }"
           @click="sidebarOpen = false"
         >
-          <span class="nav-icon">{{ item.icon }}</span>
+          <i :class="item.icon" class="nav-icon"></i>
           <span class="nav-label">{{ item.label }}</span>
         </router-link>
       </nav>
@@ -78,12 +78,16 @@
           </div>
 
           <div class="header-actions">
-            <button class="btn-icon" @click="showAI = !showAI; showNotify = false; showSettings = false" title="AI 助手">🤖</button>
-            <button class="btn-icon" @click="showNotify = !showNotify; showSettings = false; showAI = false" title="通知">
-              <span>🔔</span>
-              <span class="dot" v-if="notifications.length > 0"></span>
-            </button>
-            <button class="btn-icon" @click="showSettings = !showSettings; showNotify = false; showAI = false" title="設定">⚙️</button>
+            <button class="btn-icon" @click="showAI = !showAI; showNotify = false; showSettings = false" title="AI 助手">
+  <i class="fi fi-rr-robot"></i>
+</button>
+    <button class="btn-icon" @click="showNotify = !showNotify; showSettings = false; showAI = false" title="通知">
+      <i class="fi fi-rr-bell"></i>
+      <span class="dot" v-if="notifications.length > 0"></span>
+    </button>
+    <button class="btn-icon" @click="showSettings = !showSettings; showNotify = false; showAI = false" title="設定">
+      <i class="fi fi-rr-settings"></i>
+    </button>
           </div>
         </div>
       </header>
@@ -247,14 +251,14 @@ async function askAI() {
 }
 
 const navItems = [
-  { path: '/dashboard', icon: '📊', label: '總覽儀表板' },
-  { path: '/purchase',  icon: '📦', label: '進貨管理' },
-  { path: '/sales',     icon: '🛒', label: '銷貨管理' },
-  { path: '/inventory', icon: '🏪', label: '存貨管理' },
-  { path: '/suppliers', icon: '🏭', label: '供應商管理' },
-  { path: '/customers', icon: '👥', label: '客戶管理' },
-  { path: '/reports',   icon: '📈', label: '報表分析' },
-  { path: '/kanban', icon: '📋', label: '工作看板' },
+  { path: '/dashboard', icon: 'fi fi-rr-chart-histogram', label: '總覽儀表板' },
+  { path: '/purchase',  icon: 'fi fi-rr-box-alt', label: '進貨管理' },
+  { path: '/sales',     icon: 'fi fi-rr-shopping-cart', label: '銷貨管理' },
+  { path: '/inventory', icon: 'fi fi-rr-warehouse-alt', label: '存貨管理' },
+  { path: '/suppliers', icon: 'fi fi-rr-industry-alt', label: '供應商管理' },
+  { path: '/customers', icon: 'fi fi-rr-users', label: '客戶管理' },
+  { path: '/reports',   icon: 'fi fi-rr-stats', label: '報表分析' },
+  { path: '/kanban',    icon: 'fi fi-rr-list-check', label: '工作看板' },
 ]
 
 const now = ref(new Date())
@@ -283,7 +287,7 @@ async function loadNotifications() {
     if (res.success && res.data.length > 0) {
       notifications.value = res.data.map(item => ({
         id: item.id,
-        icon: '⚠️',
+        icon: 'fi fi-rr-triangle-warning',
         type: 'warning',
         title: '庫存不足警示',
         message: `${item.name} 現有庫存 ${item.stock} ${item.unit}，低於安全庫存 ${item.safeStock} ${item.unit}`,

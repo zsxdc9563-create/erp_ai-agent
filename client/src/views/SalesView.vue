@@ -3,13 +3,18 @@
     <!-- KPI -->
     <div class="kpi-grid">
       <div class="kpi-card" v-for="kpi in kpiData" :key="kpi.label">
-        <div class="kpi-icon" :style="{ background: kpi.bg }">{{ kpi.icon }}</div>
+        <!-- KPI 圖示 -->
+      <div class="kpi-icon" :style="{ background: kpi.bg }">
+        <i :class="kpi.icon"></i>
+      </div>
         <div class="kpi-body">
           <div class="kpi-value">{{ kpi.value }}</div>
           <div class="kpi-label">{{ kpi.label }}</div>
         </div>
         <div class="kpi-trend" :class="kpi.trendUp ? 'up' : 'down'">
-          {{ kpi.trendUp ? '▲' : '▼' }} {{ kpi.trend }}
+          <!-- 趨勢箭頭 -->
+        <i :class="kpi.trendUp ? 'fi fi-rr-arrow-trend-up' : 'fi fi-rr-arrow-trend-down'"></i>
+        {{ kpi.trend }}
         </div>
       </div>
     </div>
@@ -71,7 +76,8 @@
         <h2 class="card-title">銷貨單列表</h2>
         <div class="toolbar">
           <div class="search-box">
-            <span class="search-icon">🔍</span>
+            <!-- 搜尋圖示 -->
+          <i class="fi fi-rr-search search-icon"></i>
             <input v-model="searchQuery" class="search-input" placeholder="搜尋客戶 / 品項..." />
           </div>
           <select v-model="statusFilter" class="filter-select">
@@ -80,7 +86,10 @@
             <option value="處理中">處理中</option>
             <option value="待確認">待確認</option>
           </select>
-          <button class="btn-outline" @click="exportData">📤 匯出 CSV</button>
+          <!-- 匯出 CSV 按鈕 -->
+        <button class="btn-outline" @click="exportData">
+          <i class="fi fi-rr-file-export"></i> 匯出 CSV
+        </button>
           <button class="btn-primary" @click="showModal = true">＋ 新增銷貨單</button>
         </div>
       </div>
@@ -118,8 +127,14 @@
               </td>
               <td>
                 <div class="action-btns">
-                  <button class="btn-action" title="查看">👁</button>
-                  <button class="btn-action" title="列印">🖨️</button>
+                  <!-- 查看按鈕 -->
+                    <button class="btn-action" title="查看">
+                      <i class="fi fi-rr-eye"></i>
+                    </button>
+                    <!-- 列印按鈕 -->
+                    <button class="btn-action" title="列印">
+                      <i class="fi fi-rr-print"></i>
+                    </button>
                 </div>
               </td>
             </tr>
@@ -205,10 +220,14 @@ const orders = ref([])
 const stats = ref({ totalAmount: 0, count: 0, byStatus: {} })
 
 const kpiData = computed(() => [
-  { icon: '💳', label: '本月銷售額', value: 'NT$ ' + stats.value.totalAmount.toLocaleString(), bg: '#ECFDF5', trend: '15.2%', trendUp: true },
-  { icon: '📄', label: '本月銷貨單', value: stats.value.count, bg: '#EEF2FF', trend: '6', trendUp: true },
-  { icon: '👥', label: '活躍客戶', value: new Set(orders.value.map(o => o.customer)).size, bg: '#EFF6FF', trend: '3', trendUp: true },
-  { icon: '⏳', label: '待出貨', value: orders.value.filter(o => o.status === '待確認').length, bg: '#FFFBEB', trend: '2', trendUp: false },
+  // 本月銷售額
+  { icon: 'fi fi-rr-sack-dollar', label: '本月銷售額', value: 'NT$ ' + stats.value.totalAmount.toLocaleString(), bg: '#ECFDF5', trend: '15.2%', trendUp: true },
+  // 本月銷貨單數
+  { icon: 'fi fi-rr-document', label: '本月銷貨單', value: stats.value.count, bg: '#EEF2FF', trend: '6', trendUp: true },
+  // 活躍客戶數
+  { icon: 'fi fi-rr-users', label: '活躍客戶', value: new Set(orders.value.map(o => o.customer)).size, bg: '#EFF6FF', trend: '3', trendUp: true },
+  // 待出貨數量
+  { icon: 'fi fi-rr-time-fast', label: '待出貨', value: orders.value.filter(o => o.status === '待確認').length, bg: '#FFFBEB', trend: '2', trendUp: false },
 ])
 
 const chartBars = [

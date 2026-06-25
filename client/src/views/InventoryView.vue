@@ -3,7 +3,10 @@
     <!-- KPI -->
     <div class="kpi-grid">
       <div class="kpi-card" v-for="kpi in kpiData" :key="kpi.label">
-        <div class="kpi-icon" :style="{ background: kpi.bg }">{{ kpi.icon }}</div>
+        <!-- KPI 圖示 -->
+        <div class="kpi-icon" :style="{ background: kpi.bg }">
+          <i :class="kpi.icon"></i>
+        </div>
         <div class="kpi-body">
           <div class="kpi-value">{{ kpi.value }}</div>
           <div class="kpi-label">{{ kpi.label }}</div>
@@ -16,7 +19,8 @@
 
     <!-- Alert banner for low stock -->
     <div class="alert-banner" v-if="lowStockItems.length > 0">
-      <span class="alert-icon">⚠️</span>
+      <!-- 警示圖示 -->
+      <i class="fi fi-rr-triangle-warning alert-icon"></i>
       <span>有 <strong>{{ lowStockItems.length }}</strong> 項品項庫存不足，請儘速補貨！</span>
       <button class="alert-link" @click="statusFilter = '庫存不足'">查看詳情 →</button>
     </div>
@@ -30,7 +34,8 @@
         :class="{ selected: selectedCategory === cat.name }"
         @click="selectedCategory = selectedCategory === cat.name ? '' : cat.name"
       >
-        <div class="cat-icon">{{ cat.icon }}</div>
+        <!-- 分類圖示 -->
+        <div class="cat-icon"><i :class="cat.icon"></i></div>
         <div class="cat-name">{{ cat.name }}</div>
         <div class="cat-count">{{ cat.count }} 項</div>
       </div>
@@ -42,7 +47,7 @@
         <h2 class="card-title">存貨清單</h2>
         <div class="toolbar">
           <div class="search-box">
-            <span class="search-icon">🔍</span>
+            <i class="fi fi-rr-search search-icon"></i>
             <input v-model="searchQuery" class="search-input" placeholder="搜尋品項 / 編號..." />
           </div>
           <select v-model="statusFilter" class="filter-select">
@@ -51,7 +56,10 @@
             <option value="庫存不足">庫存不足</option>
             <option value="超量">超量</option>
           </select>
-          <button class="btn-outline" @click="exportData">📤 匯出</button>
+          <!-- 匯出按鈕 -->
+          <button class="btn-outline" @click="exportData">
+            <i class="fi fi-rr-file-export"></i> 匯出
+          </button>
           <button class="btn-primary" @click="showModal = true">＋ 新增品項</button>
         </div>
       </div>
@@ -104,8 +112,14 @@
               <td class="text-secondary">{{ item.lastUpdate }}</td>
               <td>
                 <div class="action-btns">
-                  <button class="btn-action" @click="adjustStock_(item)" title="調整">⚖️</button>
-                  <button class="btn-action" title="歷史">📋</button>
+                  <!-- 庫存調整按鈕 -->
+                <button class="btn-action" @click="adjustStock_(item)" title="調整">
+                  <i class="fi fi-rr-scale"></i>
+                </button>
+                <!-- 歷史記錄按鈕 -->
+                <button class="btn-action" title="歷史">
+                  <i class="fi fi-rr-list-check"></i>
+                </button>
                 </div>
               </td>
             </tr>
@@ -244,11 +258,12 @@ const loading = ref(false)
 const newItem = ref({ name: '', category: '電子元件', stock: null, safeStock: null, unit: '個', location: '' })
 
 const categories = [
-  { name: '電子元件', icon: '⚡', count: 0 },
-  { name: '機械零件', icon: '⚙️', count: 0 },
-  { name: '原物料',   icon: '🧪', count: 0 },
-  { name: '半成品',   icon: '🔧', count: 0 },
-  { name: '成品',     icon: '📦', count: 0 },
+  // 各分類圖示
+  { name: '電子元件', icon: 'fi fi-rr-microchip', count: 0 },
+  { name: '機械零件', icon: 'fi fi-rr-settings', count: 0 },
+  { name: '原物料',   icon: 'fi fi-rr-flask', count: 0 },
+  { name: '半成品',   icon: 'fi fi-rr-tool-box', count: 0 },
+  { name: '成品',     icon: 'fi fi-rr-box-alt', count: 0 },
 ]
 
 const items = ref([])
@@ -262,10 +277,14 @@ const categoriesWithCount = computed(() => {
 })
 
 const kpiData = computed(() => [
-  { icon: '📦', label: '品項總數',  value: items.value.length, bg: '#EEF2FF', sub: `${categoriesWithCount.value.length} 類`, urgent: false },
-  { icon: '💵', label: '庫存總值',  value: 'NT$ ' + (items.value.reduce((s, i) => s + i.stock * 100, 0)).toLocaleString(), bg: '#ECFDF5', sub: '已評估', urgent: false },
-  { icon: '⚠️', label: '庫存不足',  value: lowStockItems.value.length, bg: '#FFFBEB', sub: '需補貨', urgent: lowStockItems.value.length > 0 },
-  { icon: '🔄', label: '本月異動',  value: 127, bg: '#EFF6FF', sub: '筆記錄', urgent: false },
+  // 品項總數
+  { icon: 'fi fi-rr-warehouse-alt', label: '品項總數', value: items.value.length, bg: '#EEF2FF', sub: `${categoriesWithCount.value.length} 類`, urgent: false },
+  // 庫存總值
+  { icon: 'fi fi-rr-sack-dollar', label: '庫存總值', value: 'NT$ ' + (items.value.reduce((s, i) => s + i.stock * 100, 0)).toLocaleString(), bg: '#ECFDF5', sub: '已評估', urgent: false },
+  // 庫存不足數量
+  { icon: 'fi fi-rr-triangle-warning', label: '庫存不足', value: lowStockItems.value.length, bg: '#FFFBEB', sub: '需補貨', urgent: lowStockItems.value.length > 0 },
+  // 本月異動筆數
+  { icon: 'fi fi-rr-refresh', label: '本月異動', value: 127, bg: '#EFF6FF', sub: '筆記錄', urgent: false },
 ])
 
 const filteredItems = computed(() => {

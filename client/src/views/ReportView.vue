@@ -1,9 +1,13 @@
 <template>
   <div class="module-page">
+
     <!-- 總覽 KPI -->
     <div class="kpi-grid">
       <div class="kpi-card" v-for="kpi in kpiData" :key="kpi.label">
-        <div class="kpi-icon" :style="{ background: kpi.bg }">{{ kpi.icon }}</div>
+        <!-- KPI 圖示 -->
+        <div class="kpi-icon" :style="{ background: kpi.bg }">
+          <i :class="kpi.icon"></i>
+        </div>
         <div class="kpi-body">
           <div class="kpi-value">{{ kpi.value }}</div>
           <div class="kpi-label">{{ kpi.label }}</div>
@@ -15,7 +19,10 @@
     <div class="two-col">
       <div class="section-card">
         <div class="card-header-simple">
-          <h3 class="card-title">📈 月份銷售趨勢</h3>
+          <!-- 月份銷售趨勢標題 -->
+          <h3 class="card-title">
+            <i class="fi fi-rr-chart-histogram"></i> 月份銷售趨勢
+          </h3>
         </div>
         <div class="chart-wrap">
           <Bar v-if="salesChartData" :data="salesChartData" :options="chartOptions" />
@@ -25,7 +32,10 @@
 
       <div class="section-card">
         <div class="card-header-simple">
-          <h3 class="card-title">📦 月份進貨趨勢</h3>
+          <!-- 月份進貨趨勢標題 -->
+          <h3 class="card-title">
+            <i class="fi fi-rr-box-alt"></i> 月份進貨趨勢
+          </h3>
         </div>
         <div class="chart-wrap">
           <Bar v-if="purchaseChartData" :data="purchaseChartData" :options="chartOptions" />
@@ -38,7 +48,10 @@
     <div class="two-col">
       <div class="section-card">
         <div class="card-header-simple">
-          <h3 class="card-title">🛒 銷貨狀態分佈</h3>
+          <!-- 銷貨狀態分佈標題 -->
+          <h3 class="card-title">
+            <i class="fi fi-rr-shopping-cart"></i> 銷貨狀態分佈
+          </h3>
         </div>
         <div class="chart-wrap pie-wrap">
           <Doughnut v-if="salesStatusChartData" :data="salesStatusChartData" :options="pieOptions" />
@@ -48,7 +61,10 @@
 
       <div class="section-card">
         <div class="card-header-simple">
-          <h3 class="card-title">📦 進貨狀態分佈</h3>
+          <!-- 進貨狀態分佈標題 -->
+          <h3 class="card-title">
+            <i class="fi fi-rr-box-alt"></i> 進貨狀態分佈
+          </h3>
         </div>
         <div class="chart-wrap pie-wrap">
           <Doughnut v-if="purchaseStatusChartData" :data="purchaseStatusChartData" :options="pieOptions" />
@@ -61,7 +77,10 @@
     <div class="two-col">
       <div class="section-card">
         <div class="card-header-simple">
-          <h3 class="card-title">👥 前五大客戶</h3>
+          <!-- 前五大客戶標題 -->
+          <h3 class="card-title">
+            <i class="fi fi-rr-users"></i> 前五大客戶
+          </h3>
         </div>
         <div class="chart-wrap">
           <Bar v-if="topCustomersChartData" :data="topCustomersChartData" :options="horizontalOptions" />
@@ -71,7 +90,10 @@
 
       <div class="section-card">
         <div class="card-header-simple">
-          <h3 class="card-title">🏭 前五大供應商</h3>
+          <!-- 前五大供應商標題 -->
+          <h3 class="card-title">
+            <i class="fi fi-rr-industry-alt"></i> 前五大供應商
+          </h3>
         </div>
         <div class="chart-wrap">
           <Bar v-if="topSuppliersChartData" :data="topSuppliersChartData" :options="horizontalOptions" />
@@ -83,13 +105,17 @@
     <!-- 庫存分類 -->
     <div class="section-card">
       <div class="card-header-simple">
-        <h3 class="card-title">🏪 庫存分類統計</h3>
+        <!-- 庫存分類統計標題 -->
+        <h3 class="card-title">
+          <i class="fi fi-rr-warehouse-alt"></i> 庫存分類統計
+        </h3>
       </div>
       <div class="chart-wrap">
         <Bar v-if="inventoryCategoryChartData" :data="inventoryCategoryChartData" :options="chartOptions" />
         <div v-else class="empty-chart">載入中...</div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -109,6 +135,7 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend)
 
+// 資料狀態
 const summary = ref({})
 const monthlySales = ref([])
 const monthlyPurchase = ref([])
@@ -118,16 +145,23 @@ const topCustomers = ref([])
 const topSuppliers = ref([])
 const inventoryCategory = ref([])
 
+// KPI 卡片資料
 const kpiData = computed(() => [
-  { icon: '💰', label: '總銷售額', value: 'NT$ ' + Number(summary.value.sales?.total || 0).toLocaleString(), bg: '#ECFDF5' },
-  { icon: '📦', label: '總進貨額', value: 'NT$ ' + Number(summary.value.purchase?.total || 0).toLocaleString(), bg: '#EEF2FF' },
-  { icon: '🏪', label: '庫存品項', value: summary.value.inventory?.count || 0, bg: '#EFF6FF' },
-  { icon: '👥', label: '客戶數',   value: summary.value.customers?.count || 0, bg: '#ECFDF5' },
-  { icon: '🏭', label: '供應商數', value: summary.value.suppliers?.count || 0, bg: '#FFFBEB' },
-  { icon: '⚠️', label: '庫存不足', value: summary.value.inventory?.lowStock || 0, bg: '#FEF2F2' },
+  // 總銷售額
+  { icon: 'fi fi-rr-sack-dollar', label: '總銷售額', value: 'NT$ ' + Number(summary.value.sales?.total || 0).toLocaleString(), bg: '#ECFDF5' },
+  // 總進貨額
+  { icon: 'fi fi-rr-box-alt', label: '總進貨額', value: 'NT$ ' + Number(summary.value.purchase?.total || 0).toLocaleString(), bg: '#EEF2FF' },
+  // 庫存品項數
+  { icon: 'fi fi-rr-warehouse-alt', label: '庫存品項', value: summary.value.inventory?.count || 0, bg: '#EFF6FF' },
+  // 客戶數
+  { icon: 'fi fi-rr-users', label: '客戶數', value: summary.value.customers?.count || 0, bg: '#ECFDF5' },
+  // 供應商數
+  { icon: 'fi fi-rr-industry-alt', label: '供應商數', value: summary.value.suppliers?.count || 0, bg: '#FFFBEB' },
+  // 庫存不足數量
+  { icon: 'fi fi-rr-triangle-warning', label: '庫存不足', value: summary.value.inventory?.lowStock || 0, bg: '#FEF2F2' },
 ])
 
-// Chart Options
+// 長條圖設定
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -138,6 +172,7 @@ const chartOptions = {
   }
 }
 
+// 水平長條圖設定
 const horizontalOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -149,15 +184,14 @@ const horizontalOptions = {
   }
 }
 
+// 圓餅圖設定
 const pieOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  plugins: {
-    legend: { position: 'bottom' }
-  }
+  plugins: { legend: { position: 'bottom' } }
 }
 
-// Chart Data
+// 月份銷售趨勢資料
 const salesChartData = computed(() => {
   if (!monthlySales.value.length) return null
   return {
@@ -171,6 +205,7 @@ const salesChartData = computed(() => {
   }
 })
 
+// 月份進貨趨勢資料
 const purchaseChartData = computed(() => {
   if (!monthlyPurchase.value.length) return null
   return {
@@ -184,6 +219,7 @@ const purchaseChartData = computed(() => {
   }
 })
 
+// 銷貨狀態分佈資料
 const salesStatusChartData = computed(() => {
   if (!salesStatus.value.length) return null
   const colors = { '已出貨': '#10B981', '處理中': '#3B82F6', '待確認': '#F59E0B' }
@@ -196,6 +232,7 @@ const salesStatusChartData = computed(() => {
   }
 })
 
+// 進貨狀態分佈資料
 const purchaseStatusChartData = computed(() => {
   if (!purchaseStatus.value.length) return null
   const colors = { '已完成': '#10B981', '待入庫': '#F59E0B', '異常': '#EF4444' }
@@ -208,6 +245,7 @@ const purchaseStatusChartData = computed(() => {
   }
 })
 
+// 前五大客戶資料
 const topCustomersChartData = computed(() => {
   if (!topCustomers.value.length) return null
   return {
@@ -221,6 +259,7 @@ const topCustomersChartData = computed(() => {
   }
 })
 
+// 前五大供應商資料
 const topSuppliersChartData = computed(() => {
   if (!topSuppliers.value.length) return null
   return {
@@ -234,6 +273,7 @@ const topSuppliersChartData = computed(() => {
   }
 })
 
+// 庫存分類統計資料
 const inventoryCategoryChartData = computed(() => {
   if (!inventoryCategory.value.length) return null
   return {
@@ -247,6 +287,7 @@ const inventoryCategoryChartData = computed(() => {
   }
 })
 
+// 載入所有報表資料
 async function loadAll() {
   try {
     const [s, ms, mp, ss, ps, tc, ts, ic] = await Promise.all([
@@ -267,14 +308,13 @@ async function loadAll() {
   }
 }
 
-
-
-onMounted(loadAll) 
+onMounted(loadAll)
 </script>
 
 <style scoped>
 .module-page { display: flex; flex-direction: column; gap: 20px; }
 
+/* KPI */
 .kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
 .kpi-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: 16px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm); }
 .kpi-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
@@ -282,16 +322,22 @@ onMounted(loadAll)
 .kpi-value { font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kpi-label { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
 
+/* 版面 */
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
+/* 卡片 */
 .section-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
 .card-header-simple { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--color-border); }
-.card-title { font-size: 15px; font-weight: 600; }
 
+/* 卡片標題圖示對齊 */
+.card-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+
+/* 圖表 */
 .chart-wrap { padding: 16px 20px; height: 220px; }
 .pie-wrap { height: 260px; }
 .empty-chart { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--color-text-muted); font-size: 13px; }
 
+/* RWD */
 @media (max-width: 1024px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }

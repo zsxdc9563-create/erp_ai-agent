@@ -4,7 +4,9 @@
     <!-- 快速統計 -->
     <div class="stats-grid">
       <div class="stat-card" v-for="stat in stats" :key="stat.label" @click="router.push(stat.path)">
-        <div class="stat-icon" :style="{ background: stat.bg }">{{ stat.icon }}</div>
+        <div class="stat-icon" :style="{ background: stat.bg }">
+        <i :class="stat.icon"></i>
+    </div>
         <div class="stat-body">
           <div class="stat-value">{{ stat.value }}</div>
           <div class="stat-label">{{ stat.label }}</div>
@@ -77,7 +79,7 @@
           class="module-card"
           @click="router.push(mod.path)"
         >
-          <div class="module-icon">{{ mod.icon }}</div>
+          <div class="module-icon"><i :class="mod.icon"></i></div>
           <div class="module-name">{{ mod.name }}</div>
           <div class="module-desc">{{ mod.desc }}</div>
         </div>
@@ -113,22 +115,22 @@ const currentTime = computed(() => {
 })
 
 const stats = computed(() => [
-  { icon: '💰', label: '總銷售額', value: 'NT$ ' + Number(summary.value.sales?.total || 0).toLocaleString(), bg: '#ECFDF5', path: '/sales' },
-  { icon: '📦', label: '總進貨額', value: 'NT$ ' + Number(summary.value.purchase?.total || 0).toLocaleString(), bg: '#EEF2FF', path: '/purchase' },
-  { icon: '🏪', label: '庫存品項', value: (summary.value.inventory?.count || 0) + ' 項', bg: '#EFF6FF', path: '/inventory' },
-  { icon: '⚠️', label: '庫存不足', value: (summary.value.inventory?.lowStock || 0) + ' 項', bg: '#FEF2F2', path: '/inventory' },
-  { icon: '👥', label: '客戶數', value: (summary.value.customers?.count || 0) + ' 家', bg: '#ECFDF5', path: '/customers' },
-  { icon: '🏭', label: '供應商數', value: (summary.value.suppliers?.count || 0) + ' 家', bg: '#FFFBEB', path: '/suppliers' },
+  { icon: 'fi fi-rr-sack-dollar', label: '總銷售額', value: 'NT$ ' + Number(summary.value.sales?.total || 0).toLocaleString(), bg: '#ECFDF5', path: '/sales' },
+  { icon: 'fi fi-rr-box-alt', label: '總進貨額', value: 'NT$ ' + Number(summary.value.purchase?.total || 0).toLocaleString(), bg: '#EEF2FF', path: '/purchase' },
+  { icon: 'fi fi-rr-warehouse-alt', label: '庫存品項', value: (summary.value.inventory?.count || 0) + ' 項', bg: '#EFF6FF', path: '/inventory' },
+  { icon: 'fi fi-rr-triangle-warning', label: '庫存不足', value: (summary.value.inventory?.lowStock || 0) + ' 項', bg: '#FEF2F2', path: '/inventory' },
+  { icon: 'fi fi-rr-users', label: '客戶數', value: (summary.value.customers?.count || 0) + ' 家', bg: '#ECFDF5', path: '/customers' },
+  { icon: 'fi fi-rr-industry-alt', label: '供應商數', value: (summary.value.suppliers?.count || 0) + ' 家', bg: '#FFFBEB', path: '/suppliers' },
 ])
 
 const modules = [
-  { icon: '📊', name: '總覽儀表板', desc: '查看系統整體數據與即時狀態', path: '/dashboard' },
-  { icon: '📦', name: '進貨管理', desc: '管理採購訂單與供應商進貨', path: '/purchase' },
-  { icon: '🛒', name: '銷貨管理', desc: '管理銷售訂單與客戶出貨', path: '/sales' },
-  { icon: '🏪', name: '存貨管理', desc: '管理庫存品項與庫存調整', path: '/inventory' },
-  { icon: '🏭', name: '供應商管理', desc: '管理供應商資料與聯絡資訊', path: '/suppliers' },
-  { icon: '👥', name: '客戶管理', desc: '管理客戶資料與聯絡資訊', path: '/customers' },
-  { icon: '📈', name: '報表分析', desc: '查看銷售趨勢與業績報表', path: '/reports' },
+  { icon: 'fi fi-rr-chart-histogram', name: '總覽儀表板', desc: '查看系統整體數據與即時狀態', path: '/dashboard' },
+  { icon: 'fi fi-rr-box-alt', name: '進貨管理', desc: '管理採購訂單與供應商進貨', path: '/purchase' },
+  { icon: 'fi fi-rr-shopping-cart', name: '銷貨管理', desc: '管理銷售訂單與客戶出貨', path: '/sales' },
+  { icon: 'fi fi-rr-warehouse-alt', name: '存貨管理', desc: '管理庫存品項與庫存調整', path: '/inventory' },
+  { icon: 'fi fi-rr-industry-alt', name: '供應商管理', desc: '管理供應商資料與聯絡資訊', path: '/suppliers' },
+  { icon: 'fi fi-rr-users', name: '客戶管理', desc: '管理客戶資料與聯絡資訊', path: '/customers' },
+  { icon: 'fi fi-rr-stats', name: '報表分析', desc: '查看銷售趨勢與業績報表', path: '/reports' },
 ]
 
 const systemInfo = [

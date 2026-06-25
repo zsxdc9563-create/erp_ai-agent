@@ -1,30 +1,43 @@
 <template>
   <div class="module-page">
+
     <!-- KPI -->
     <div class="kpi-grid">
+      <!-- 供應商總數 -->
       <div class="kpi-card">
-        <div class="kpi-icon" style="background:#EEF2FF">🏭</div>
+        <div class="kpi-icon" style="background:#EEF2FF">
+          <i class="fi fi-rr-industry-alt"></i>
+        </div>
         <div class="kpi-body">
           <div class="kpi-value">{{ suppliers.length }}</div>
           <div class="kpi-label">供應商總數</div>
         </div>
       </div>
+      <!-- 合作中 -->
       <div class="kpi-card">
-        <div class="kpi-icon" style="background:#ECFDF5">✅</div>
+        <div class="kpi-icon" style="background:#ECFDF5">
+          <i class="fi fi-rr-checkbox"></i>
+        </div>
         <div class="kpi-body">
           <div class="kpi-value">{{ suppliers.length }}</div>
           <div class="kpi-label">合作中</div>
         </div>
       </div>
+      <!-- 本月有進貨 -->
       <div class="kpi-card">
-        <div class="kpi-icon" style="background:#EFF6FF">📦</div>
+        <div class="kpi-icon" style="background:#EFF6FF">
+          <i class="fi fi-rr-box-alt"></i>
+        </div>
         <div class="kpi-body">
           <div class="kpi-value">{{ suppliers.length }}</div>
           <div class="kpi-label">本月有進貨</div>
         </div>
       </div>
+      <!-- 優質供應商 -->
       <div class="kpi-card">
-        <div class="kpi-icon" style="background:#FFFBEB">⭐</div>
+        <div class="kpi-icon" style="background:#FFFBEB">
+          <i class="fi fi-rr-star"></i>
+        </div>
         <div class="kpi-body">
           <div class="kpi-value">5</div>
           <div class="kpi-label">優質供應商</div>
@@ -38,10 +51,12 @@
         <h2 class="card-title">供應商列表</h2>
         <div class="toolbar">
           <div class="search-box">
-            <span class="search-icon">🔍</span>
+            <i class="fi fi-rr-search search-icon"></i>
             <input v-model="searchQuery" class="search-input" placeholder="搜尋供應商..." />
           </div>
-          <button class="btn-outline" @click="exportData">📤 匯出 CSV</button>
+          <button class="btn-outline" @click="exportData">
+            <i class="fi fi-rr-file-export"></i> 匯出 CSV
+          </button>
           <button class="btn-primary" @click="openModal()">＋ 新增供應商</button>
         </div>
       </div>
@@ -76,8 +91,14 @@
               <td class="text-secondary">{{ s.created_at?.slice(0,10) }}</td>
               <td>
                 <div class="action-btns">
-                  <button class="btn-action" @click="openModal(s)" title="編輯">✏️</button>
-                  <button class="btn-action btn-danger" @click="deleteItem(s)" title="刪除">🗑️</button>
+                  <!-- 編輯按鈕 -->
+                  <button class="btn-action" @click="openModal(s)" title="編輯">
+                    <i class="fi fi-rr-edit"></i>
+                  </button>
+                  <!-- 刪除按鈕 -->
+                  <button class="btn-action btn-danger" @click="deleteItem(s)" title="刪除">
+                    <i class="fi fi-rr-trash"></i>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -134,6 +155,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -198,12 +220,12 @@ async function deleteItem(item) {
 
 function exportData() {
   exportToCSV(filteredSuppliers.value, '供應商', [
-    { label: '編號',     key: 'id' },
+    { label: '編號',       key: 'id' },
     { label: '供應商名稱', key: 'name' },
-    { label: '聯絡人',   key: 'contact' },
-    { label: '電話',     key: 'phone' },
-    { label: 'Email',    key: 'email' },
-    { label: '地址',     key: 'address' },
+    { label: '聯絡人',     key: 'contact' },
+    { label: '電話',       key: 'phone' },
+    { label: 'Email',      key: 'email' },
+    { label: '地址',       key: 'address' },
   ])
 }
 
@@ -228,8 +250,8 @@ onMounted(loadData)
 .search-icon { font-size: 13px; opacity: 0.5; }
 .search-input { border: none; background: transparent; outline: none; font-size: 13px; width: 180px; font-family: inherit; }
 .btn-primary { background: var(--color-accent); color: white; border: none; border-radius: var(--border-radius); padding: 8px 16px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
-.btn-outline { background: white; border: 1px solid var(--color-border); border-radius: var(--border-radius); padding: 8px 14px; font-size: 13px; cursor: pointer; font-family: inherit; }
-.btn-outline:hover { background: var(--color-bg); }
+.btn-outline { background: var(--color-accent); color: white; border: none; border-radius: var(--border-radius); padding: 8px 14px; font-size: 13px; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px; }
+.btn-outline:hover { background: var(--color-accent-dark); }
 
 .table-wrap { overflow-x: auto; }
 table th { background: #F8F9FC; padding: 10px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--color-border); white-space: nowrap; }
@@ -240,15 +262,12 @@ table td { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; font-size: 13.5
 .font-medium { font-weight: 500; }
 .text-accent { color: var(--color-accent); }
 .text-secondary { color: var(--color-text-secondary); }
-
 .name-cell { display: flex; align-items: center; gap: 8px; }
 .avatar-circle { width: 28px; height: 28px; border-radius: 50%; background: #EEF2FF; color: var(--color-accent); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
 .action-btns { display: flex; gap: 6px; }
 .btn-action { width: 28px; height: 28px; border: 1px solid var(--color-border); border-radius: 6px; background: white; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; }
 .btn-action:hover { background: var(--color-bg); }
 .btn-danger:hover { background: var(--color-danger-light); border-color: var(--color-danger); }
-
 .empty-row { text-align: center; color: var(--color-text-muted); padding: 32px !important; }
 .pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--color-border); }
 .page-info { font-size: 13px; color: var(--color-text-secondary); }
@@ -276,3 +295,4 @@ textarea.form-control { resize: vertical; }
   .form-grid { grid-template-columns: 1fr; }
 }
 </style>
+

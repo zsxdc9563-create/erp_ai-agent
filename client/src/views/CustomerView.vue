@@ -1,30 +1,43 @@
 <template>
   <div class="module-page">
+
     <!-- KPI -->
     <div class="kpi-grid">
+      <!-- 客戶總數 -->
       <div class="kpi-card">
-        <div class="kpi-icon" style="background:#ECFDF5">👥</div>
+        <div class="kpi-icon" style="background:#ECFDF5">
+          <i class="fi fi-rr-users"></i>
+        </div>
         <div class="kpi-body">
           <div class="kpi-value">{{ customers.length }}</div>
           <div class="kpi-label">客戶總數</div>
         </div>
       </div>
+      <!-- 合作中 -->
       <div class="kpi-card">
-        <div class="kpi-icon" style="background:#EEF2FF">💳</div>
+        <div class="kpi-icon" style="background:#EEF2FF">
+          <i class="fi fi-rr-handshake"></i>
+        </div>
         <div class="kpi-body">
           <div class="kpi-value">{{ customers.length }}</div>
           <div class="kpi-label">合作中</div>
         </div>
       </div>
+      <!-- 本月有訂單 -->
       <div class="kpi-card">
-        <div class="kpi-icon" style="background:#EFF6FF">🛒</div>
+        <div class="kpi-icon" style="background:#EFF6FF">
+          <i class="fi fi-rr-shopping-cart"></i>
+        </div>
         <div class="kpi-body">
           <div class="kpi-value">{{ customers.length }}</div>
           <div class="kpi-label">本月有訂單</div>
         </div>
       </div>
+      <!-- VIP 客戶 -->
       <div class="kpi-card">
-        <div class="kpi-icon" style="background:#FFFBEB">⭐</div>
+        <div class="kpi-icon" style="background:#FFFBEB">
+          <i class="fi fi-rr-star"></i>
+        </div>
         <div class="kpi-body">
           <div class="kpi-value">5</div>
           <div class="kpi-label">VIP 客戶</div>
@@ -38,10 +51,12 @@
         <h2 class="card-title">客戶列表</h2>
         <div class="toolbar">
           <div class="search-box">
-            <span class="search-icon">🔍</span>
+            <i class="fi fi-rr-search search-icon"></i>
             <input v-model="searchQuery" class="search-input" placeholder="搜尋客戶..." />
           </div>
-          <button class="btn-outline" @click="exportData">📤 匯出 CSV</button>
+          <button class="btn-outline" @click="exportData">
+            <i class="fi fi-rr-file-export"></i> 匯出 CSV
+          </button>
           <button class="btn-primary" @click="openModal()">＋ 新增客戶</button>
         </div>
       </div>
@@ -76,8 +91,12 @@
               <td class="text-secondary">{{ c.created_at?.slice(0,10) }}</td>
               <td>
                 <div class="action-btns">
-                  <button class="btn-action" @click="openModal(c)" title="編輯">✏️</button>
-                  <button class="btn-action btn-danger" @click="deleteItem(c)" title="刪除">🗑️</button>
+                  <button class="btn-action" @click="openModal(c)" title="編輯">
+                    <i class="fi fi-rr-edit"></i>
+                  </button>
+                  <button class="btn-action btn-danger" @click="deleteItem(c)" title="刪除">
+                    <i class="fi fi-rr-trash"></i>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -134,6 +153,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -146,7 +166,6 @@ const customers = ref([])
 const searchQuery = ref('')
 const showModal = ref(false)
 const editItem = ref(null)
-
 const form = ref({ name: '', contact: '', phone: '', email: '', address: '', note: '' })
 
 const filteredCustomers = computed(() => {
@@ -198,12 +217,12 @@ async function deleteItem(item) {
 
 function exportData() {
   exportToCSV(filteredCustomers.value, '客戶', [
-    { label: '編號',   key: 'id' },
+    { label: '編號',     key: 'id' },
     { label: '客戶名稱', key: 'name' },
-    { label: '聯絡人', key: 'contact' },
-    { label: '電話',   key: 'phone' },
-    { label: 'Email',  key: 'email' },
-    { label: '地址',   key: 'address' },
+    { label: '聯絡人',   key: 'contact' },
+    { label: '電話',     key: 'phone' },
+    { label: 'Email',    key: 'email' },
+    { label: '地址',     key: 'address' },
   ])
 }
 
@@ -212,14 +231,12 @@ onMounted(loadData)
 
 <style scoped>
 .module-page { display: flex; flex-direction: column; gap: 20px; }
-
 .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .kpi-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: 16px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm); }
 .kpi-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
 .kpi-body { flex: 1; }
 .kpi-value { font-size: 20px; font-weight: 700; }
 .kpi-label { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
-
 .section-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
 .card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--color-border); }
 .card-title { font-size: 15px; font-weight: 600; }
@@ -228,9 +245,8 @@ onMounted(loadData)
 .search-icon { font-size: 13px; opacity: 0.5; }
 .search-input { border: none; background: transparent; outline: none; font-size: 13px; width: 180px; font-family: inherit; }
 .btn-primary { background: var(--color-accent); color: white; border: none; border-radius: var(--border-radius); padding: 8px 16px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
-.btn-outline { background: white; border: 1px solid var(--color-border); border-radius: var(--border-radius); padding: 8px 14px; font-size: 13px; cursor: pointer; font-family: inherit; }
-.btn-outline:hover { background: var(--color-bg); }
-
+.btn-outline { background: var(--color-accent); color: white; border: none; border-radius: var(--border-radius); padding: 8px 14px; font-size: 13px; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px; }
+.btn-outline:hover { background: var(--color-accent-dark); }
 .table-wrap { overflow-x: auto; }
 table th { background: #F8F9FC; padding: 10px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--color-border); white-space: nowrap; }
 table td { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; font-size: 13.5px; }
@@ -240,19 +256,15 @@ table td { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; font-size: 13.5
 .font-medium { font-weight: 500; }
 .text-accent { color: var(--color-accent); }
 .text-secondary { color: var(--color-text-secondary); }
-
 .name-cell { display: flex; align-items: center; gap: 8px; }
 .avatar-circle { width: 28px; height: 28px; border-radius: 50%; background: #ECFDF5; color: var(--color-success); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
 .action-btns { display: flex; gap: 6px; }
 .btn-action { width: 28px; height: 28px; border: 1px solid var(--color-border); border-radius: 6px; background: white; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; }
 .btn-action:hover { background: var(--color-bg); }
 .btn-danger:hover { background: var(--color-danger-light); border-color: var(--color-danger); }
-
 .empty-row { text-align: center; color: var(--color-text-muted); padding: 32px !important; }
 .pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--color-border); }
 .page-info { font-size: 13px; color: var(--color-text-secondary); }
-
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 1000; }
 .modal { background: white; border-radius: var(--border-radius-lg); width: 540px; max-width: 95vw; box-shadow: var(--shadow-md); }
 .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--color-border); }
@@ -267,7 +279,6 @@ table td { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; font-size: 13.5
 .form-control:focus { border-color: var(--color-accent); }
 textarea.form-control { resize: vertical; }
 .btn-secondary { border: 1px solid var(--color-border); background: white; border-radius: var(--border-radius); padding: 8px 16px; font-size: 13px; cursor: pointer; font-family: inherit; }
-
 @media (max-width: 1024px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 768px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
