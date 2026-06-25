@@ -3,8 +3,8 @@
 一套自建的全端 ERP 系統，整合採購、銷售、庫存、客戶等模組，並內建一個**全地端（不依賴雲端 API）的 AI 助手**。
 
 AI 助手有兩種模式：
-- **📰 查時事**：透過自架的 SearXNG 搜尋 + 爬蟲抓取新聞正文，交給本地 LLM 摘要（RAG）。
-- **📊 查庫存**：AI 自動讀取資料庫 Schema，判斷要查哪張資料表，直接對 MySQL 查詢後用自然語言回答。
+- **查時事**：透過自架的 SearXNG 搜尋 + 爬蟲抓取新聞正文，交給本地 LLM 摘要（RAG）。
+- **查庫存**：AI 自動讀取資料庫 Schema，判斷要查哪張資料表，直接對 MySQL 查詢後用自然語言回答。
 
 > 學習導向專案，採用標準三層架構（Routes → Controllers → Models），重點在理解每一層的職責。
 
@@ -76,7 +76,7 @@ Vue → Node (proxy /api/ai/erp) → Python (/erp)
 
 | 層 | 技術 |
 |---|---|
-| 前端 | Vue 3、Vite、Vue Router、Pinia、Chart.js |
+| 前端 | Vue 3、Vite、Vue Router、Pinia、Chart.js、Flaticon Uicons |
 | 後端 | Node.js、Express、JWT 驗證 |
 | 資料庫 | MySQL 9.7 |
 | AI 服務 | Python、FastAPI、uvicorn |
@@ -105,6 +105,7 @@ erp-system/
 │   │   │   └── auth.js     #   使用者登入狀態（JWT、角色）
 │   │   ├── router/         # 路由 + 守衛
 │   │   └── App.vue         # 主版面（Sidebar、Header、AI 助手面板）
+│   ├── index.html          # 引入 Flaticon Uicons CDN
 │   └── .env                # 前端環境變數（VITE_API_URL）
 ├── server/                 # Node / Express 後端
 │   ├── routes/             # 路由層
@@ -139,6 +140,7 @@ erp-system/
 ### ERP 核心模組
 | 模組 | 功能 |
 |---|---|
+| 首頁 | 快速統計、工作看板（首頁版）、系統模組導覽 |
 | 總覽儀表板 | 銷售額、進貨額、庫存概況、圖表分析 |
 | 進貨管理 | 採購訂單 CRUD、匯出 CSV |
 | 銷貨管理 | 銷售訂單 CRUD、匯出 CSV |
@@ -150,6 +152,7 @@ erp-system/
 ### 工作看板（Kanban）
 - 四欄看板：待處理 / 進行中 / 審核中 / 完成
 - 拖曳移動卡片
+- 首頁嵌入版 + `/kanban` 獨立頁面
 - **三層角色權限：**
 
 | 角色 | 新增 | 讀取 | 拖曳移動 | 刪除 | 指派給人 |
@@ -170,6 +173,7 @@ erp-system/
 - 三層角色管理（系統管理員 / 主管 / 一般使用者）
 - 庫存不足通知（右上角鈴鐺）
 - 側邊欄收合
+- Flaticon Uicons 圖示系統（CDN，`fi fi-rr-*` / `fi fi-sr-*`）
 
 ---
 
@@ -313,7 +317,7 @@ Python 服務互動式文件（自動生成）：`http://127.0.0.1:8000/docs`
 
 ---
 
-#### `POST /erp`　查 ERP 資料（Text-to-SQL）
+#### `POST /erp`　查 ERP 資料
 
 **Request**
 ```json
@@ -342,7 +346,7 @@ Python 服務互動式文件（自動生成）：`http://127.0.0.1:8000/docs`
 - **Text-to-SQL 架構**：AI 服務啟動時自動讀取 MySQL Schema（含範例資料），根據使用者問題判斷資料表，程式碼組成安全的 SQL 查詢（不讓 AI 直接產生 SQL，避免 injection 和語法錯誤）。
 - **三層角色權限**：前端隱藏按鈕 + 後端 `requireRole` middleware 雙重保護。
 - **JWT 驗證**：`middleware/auth.js` 統一驗證，`dotenv` 管理密鑰，密鑰不寫死在程式碼中。
-- **Express middleware 順序**：`express.json()` 必須在所有路由之前。
+- **Flaticon Uicons**：介面圖示全面採用 `fi fi-rr-*` / `fi fi-sr-*`，透過 CDN 引入，無需下載。
 - **RAG 模式**：先檢索（搜尋／查資料庫）再交給 LLM 生成，避免幻覺、補足即時資訊。
 - **全地端推論**：模型在本機跑，資料不外傳、無 API 費用。
 - **datetime 序列化**：MySQL 回傳的 `datetime` 物件統一轉成字串再回傳，避免 JSON 序列化失敗。
@@ -361,7 +365,8 @@ Python 服務互動式文件（自動生成）：`http://127.0.0.1:8000/docs`
 | SearXNG API 回 HTML | `settings.yml` 未開 JSON | 加入 `formats: [html, json]` 並重啟容器 |
 | 改了程式無效 | 服務未重新載入 | 重啟該服務 |
 | 載入模型很慢 | CPU 推論、模型約 5GB | 屬正常，首次載入需 10–30 秒 |
-| AI 查詢資料表錯誤 | 問題關鍵字不在判斷清單 | 在 `main.py` 第二步的關鍵字清單補充 |
+| AI 查詢資料表錯誤 | 問題關鍵字不在判斷清單 | 在 `main.py` 關鍵字清單補充 |
+| Flaticon 圖示不顯示 | CDN 連線失敗或未引入 | 確認 `index.html` 有引入 Uicons CDN |
 
 ---
 
